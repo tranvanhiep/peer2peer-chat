@@ -1,6 +1,7 @@
 import styled from '@emotion/styled';
 import {
   ChangeEvent,
+  FormEvent,
   KeyboardEvent,
   useCallback,
   useRef,
@@ -10,7 +11,7 @@ import { TextArea } from './Input';
 import { InputBox } from './InputBox';
 import { SendButton } from './SendButton';
 
-const ChatBoxContainer = styled.div`
+const ChatBoxContainer = styled.form`
   display: flex;
   position: absolute;
   left: 0;
@@ -50,18 +51,23 @@ export const ChatBox = () => {
     [setIsSendDisabled]
   );
 
-  const onSubmit = useCallback(() => {
-    const { current } = textAreaRef;
+  const onSubmit = useCallback(
+    (event?: FormEvent<HTMLFormElement>) => {
+      event?.preventDefault();
+      const { current } = textAreaRef;
 
-    console.log(current?.value);
+      console.log(current?.value);
 
-    if (!current) {
-      return;
-    }
+      if (!current) {
+        return;
+      }
 
-    current.value = '';
-    setLine(0);
-  }, [setLine]);
+      current.value = '';
+      setLine(0);
+      setIsSendDisabled(true);
+    },
+    [setLine, setIsSendDisabled]
+  );
 
   const onKeyDown = useCallback(
     (event: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -89,17 +95,18 @@ export const ChatBox = () => {
   );
 
   return (
-    <ChatBoxContainer>
+    <ChatBoxContainer onSubmit={onSubmit}>
       <StyledInputBox line={line}>
         <TextArea
           ref={textAreaRef}
           rows={1}
+          name="message"
           placeholder="Text message"
           onChange={onChange}
           onKeyDown={onKeyDown}
         />
       </StyledInputBox>
-      <StyledSendButton disabled={isSendDisabled} />
+      <StyledSendButton type="submit" disabled={isSendDisabled} />
     </ChatBoxContainer>
   );
 };

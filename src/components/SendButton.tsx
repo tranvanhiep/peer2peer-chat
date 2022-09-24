@@ -1,4 +1,5 @@
 import styled from '@emotion/styled';
+import { ComponentPropsWithoutRef } from 'react';
 
 type IconProps = {
   className?: string;
@@ -10,7 +11,7 @@ const Icon = ({ className }: IconProps) => (
   </svg>
 );
 
-type SendButtonProps = {
+type SendButtonProps = ComponentPropsWithoutRef<'button'> & {
   disabled: boolean;
   className?: string;
 };
@@ -32,16 +33,19 @@ const Button = styled.button<SendButtonProps>`
   height: 52px;
   border: none;
   border-radius: 50%;
-  background-color: var(
-    ${({ disabled }) =>
-      disabled ? '--button-inactive-color' : '--button-active-color'}
-  );
+  background-color: ${({ disabled }) =>
+    disabled ? 'var(--button-inactive-color)' : 'var(--button-active-color)'};
   box-shadow: var(--button-shadow);
+  cursor: ${({ disabled }) => (disabled ? 'default' : 'pointer')};
 `;
 
-export const SendButton = ({ disabled, className }: SendButtonProps) => {
+export const SendButton = ({
+  disabled,
+  className,
+  ...rest
+}: SendButtonProps) => {
   return (
-    <Button className={className} disabled={disabled}>
+    <Button className={className} disabled={disabled} {...rest}>
       <SendIcon disabled={disabled} />
     </Button>
   );
