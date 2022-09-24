@@ -34,7 +34,7 @@ export type AvatarProps = {
 
 export const Avatar = ({ name }: AvatarProps) => {
   const createId = useCallback(() => {
-    const alphabet: string = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
     return alphabet.at(Math.random() * alphabet.length);
   }, []);

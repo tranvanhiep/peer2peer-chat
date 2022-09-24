@@ -5,3 +5,6 @@ export * from './MessageGroup';
 export * from './ChatBox';
 export * from './Input';
 export * from './SendButton';
+export * from './Modal';
+export * from './InputBox';
+export * from './StartButton';

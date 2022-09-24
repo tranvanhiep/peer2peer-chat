@@ -1,12 +1,12 @@
+import { css } from '@emotion/react';
 import styled from '@emotion/styled';
-import { ChangeEvent, forwardRef, Ref } from 'react';
 
-const TextArea = styled.textarea`
+const baseStyle = css`
   padding: 14px 0;
+  font-family: var(--base-font);
   font-size: 14px;
   line-height: 20px;
   color: var(--input-color);
-  resize: none;
   border: none;
   width: 100%;
   height: auto;
@@ -15,20 +15,11 @@ const TextArea = styled.textarea`
   overflow: hidden;
 `;
 
-type InputProps = {
-  onChange(event: ChangeEvent<HTMLTextAreaElement>): void;
-};
+export const Input = styled.input`
+  ${baseStyle};
+`;
 
-const Input = ({ onChange }: InputProps, ref: Ref<HTMLTextAreaElement>) => {
-  return (
-    <TextArea
-      ref={ref}
-      rows={1}
-      placeholder="Text message"
-      spellCheck={false}
-      onChange={onChange}
-    />
-  );
-};
-
-export default forwardRef<HTMLTextAreaElement, InputProps>(Input);
+export const TextArea = styled.textarea`
+  ${baseStyle};
+  resize: none;
+`;
