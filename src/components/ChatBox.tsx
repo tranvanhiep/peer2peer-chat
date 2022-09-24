@@ -1,6 +1,13 @@
 import styled from '@emotion/styled';
-import { ChangeEvent, useCallback, useRef, useState } from 'react';
-import Input from './Input';
+import {
+  ChangeEvent,
+  KeyboardEvent,
+  useCallback,
+  useRef,
+  useState,
+} from 'react';
+import { TextArea } from './Input';
+import { InputBox } from './InputBox';
 import { SendButton } from './SendButton';
 
 const ChatBoxContainer = styled.div`
@@ -12,19 +19,13 @@ const ChatBoxContainer = styled.div`
   padding: 0 30px 30px;
 `;
 
-type InputContainerProps = {
+type StyledInputBoxProps = {
   line: number;
 };
 
-const InputContainer = styled.div<InputContainerProps>`
-  display: flex;
+const StyledInputBox = styled(InputBox)<StyledInputBoxProps>`
   margin-right: 8px;
-  padding: 0 20px;
-  width: 100%;
   height: ${({ line }) => (line * 20 > 52 ? `${line * 20}px` : 'auto')};
-  border-radius: 26px;
-  background-color: var(--input-bg-color);
-  box-shadow: var(--input-shadow);
 `;
 
 const StyledSendButton = styled(SendButton)`
@@ -32,9 +33,49 @@ const StyledSendButton = styled(SendButton)`
 `;
 
 export const ChatBox = () => {
-  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const [line, setLine] = useState<number>(0);
   const [isSendDisabled, setIsSendDisabled] = useState<boolean>(true);
+
+  const validateInput = useCallback(
+    (value: string) => {
+      if (value.trim()) {
+        setIsSendDisabled(false);
+
+        return;
+      }
+
+      setIsSendDisabled(true);
+    },
+    [setIsSendDisabled]
+  );
+
+  const onSubmit = useCallback(() => {
+    const { current } = textAreaRef;
+
+    console.log(current?.value);
+
+    if (!current) {
+      return;
+    }
+
+    current.value = '';
+    setLine(0);
+  }, [setLine]);
+
+  const onKeyDown = useCallback(
+    (event: KeyboardEvent<HTMLTextAreaElement>) => {
+      const { key, shiftKey } = event;
+
+      if (key !== 'Enter' || shiftKey) {
+        return;
+      }
+
+      event.preventDefault();
+      onSubmit();
+    },
+    [onSubmit]
+  );
 
   const onChange = useCallback(
     (event: ChangeEvent<HTMLTextAreaElement>) => {
@@ -42,21 +83,22 @@ export const ChatBox = () => {
       const lines = target.value.split('\n').length;
 
       setLine(lines ? lines : 0);
-
-      if (target.value.trim()) {
-        setIsSendDisabled(false);
-      } else {
-        setIsSendDisabled(true);
-      }
+      validateInput(target.value);
     },
-    [setLine]
+    [setLine, validateInput]
   );
 
   return (
     <ChatBoxContainer>
-      <InputContainer line={line}>
-        <Input ref={inputRef} onChange={onChange} />
-      </InputContainer>
+      <StyledInputBox line={line}>
+        <TextArea
+          ref={textAreaRef}
+          rows={1}
+          placeholder="Text message"
+          onChange={onChange}
+          onKeyDown={onKeyDown}
+        />
+      </StyledInputBox>
       <StyledSendButton disabled={isSendDisabled} />
     </ChatBoxContainer>
   );

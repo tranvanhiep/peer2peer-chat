@@ -18,12 +18,10 @@ type SendButtonProps = {
 const SendIcon = styled(Icon)<SendButtonProps>`
   width: 40px;
   height: 40px;
-  color: var(
-    ${({ disabled }) => (disabled ? '--icon-disabled-color' : '--icon-color')}
-  );
-  fill: var(
-    ${({ disabled }) => (disabled ? '--icon-disabled-color' : '--icon-color')}
-  );
+  color: ${({ disabled }) =>
+    disabled ? 'var(--icon-disabled-color)' : 'var(--icon-color)'};
+  fill: ${({ disabled }) =>
+    disabled ? 'var(--icon-disabled-color)' : 'var(--icon-color)'};
 `;
 
 const Button = styled.button<SendButtonProps>`
