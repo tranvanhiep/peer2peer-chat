@@ -70,39 +70,33 @@ export const Modal = ({ open = false }: ModalProps) => {
   const [disabled, setDisabled] = useState<boolean>(true);
   const [close, setClose] = useState<boolean>(false);
   const [isClosing, setIsClosing] = useState<boolean>(false);
-  const timeoutId = useRef<number>();
+  const timeoutId = useRef<NodeJS.Timeout>();
 
-  const onChange = useCallback(
-    (event: ChangeEvent<HTMLInputElement>) => {
-      const { target } = event;
-      if (!target.value.trim()) {
-        setDisabled(true);
+  const onChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+    const { target } = event;
+    if (!target.value.trim()) {
+      setDisabled(true);
 
-        return;
-      }
+      return;
+    }
 
-      setDisabled(false);
-    },
-    [setDisabled]
-  );
+    setDisabled(false);
+  }, []);
 
-  const onSubmit = useCallback(
-    (event: FormEvent<HTMLFormElement>) => {
-      event.preventDefault();
-      const { current } = inputRef;
+  const onSubmit = useCallback((event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const { current } = inputRef;
 
-      if (!current?.value.trim()) {
-        return;
-      }
+    if (!current?.value.trim()) {
+      return;
+    }
 
-      localStorage.setItem('name', current.value);
-      setIsClosing(true);
-      timeoutId.current = setTimeout(() => {
-        setClose(true);
-      }, 300);
-    },
-    [setClose]
-  );
+    localStorage.setItem('name', current.value);
+    setIsClosing(true);
+    timeoutId.current = setTimeout(() => {
+      setClose(true);
+    }, 300);
+  }, []);
 
   if (!open || close) {
     clearTimeout(timeoutId.current);

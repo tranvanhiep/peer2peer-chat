@@ -6,6 +6,7 @@ type MessageContainerProps = {
 
 const MessageContainer = styled.div<MessageContainerProps>`
   padding: 10px 12px;
+  margin-left: ${({ type }) => (type === MessageType.Incoming ? '10px' : '0')};
   background: ${({ type }) =>
     type === MessageType.Incoming
       ? 'var(--incoming-bg-color)'
