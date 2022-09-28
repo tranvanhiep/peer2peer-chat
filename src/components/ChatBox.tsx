@@ -33,40 +33,40 @@ const StyledSendButton = styled(SendButton)`
   margin-left: auto;
 `;
 
-export const ChatBox = () => {
+export type ChatBoxProps = {
+  submit(message: string): void;
+};
+
+export const ChatBox = ({ submit }: ChatBoxProps) => {
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const [line, setLine] = useState<number>(0);
   const [isSendDisabled, setIsSendDisabled] = useState<boolean>(true);
 
-  const validateInput = useCallback(
-    (value: string) => {
-      if (value.trim()) {
-        setIsSendDisabled(false);
+  const validateInput = useCallback((value: string) => {
+    if (value.trim()) {
+      setIsSendDisabled(false);
 
-        return;
-      }
+      return;
+    }
 
-      setIsSendDisabled(true);
-    },
-    [setIsSendDisabled]
-  );
+    setIsSendDisabled(true);
+  }, []);
 
   const onSubmit = useCallback(
     (event?: FormEvent<HTMLFormElement>) => {
       event?.preventDefault();
       const { current } = textAreaRef;
 
-      console.log(current?.value);
-
-      if (!current) {
+      if (!current?.value) {
         return;
       }
 
+      submit(current.value);
       current.value = '';
       setLine(0);
       setIsSendDisabled(true);
     },
-    [setLine, setIsSendDisabled]
+    [submit]
   );
 
   const onKeyDown = useCallback(
@@ -91,7 +91,7 @@ export const ChatBox = () => {
       setLine(lines ? lines : 0);
       validateInput(target.value);
     },
-    [setLine, validateInput]
+    [validateInput]
   );
 
   return (
