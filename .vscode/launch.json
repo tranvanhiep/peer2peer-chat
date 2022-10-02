@@ -7,7 +7,7 @@
     {
       "name": "nodemon",
       "request": "launch",
-      "runtimeArgs": ["run", "start"],
+      "runtimeArgs": ["run", "dev:server"],
       "runtimeExecutable": "npm",
       "skipFiles": ["<node_internals>/**"],
       "type": "node",

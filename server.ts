@@ -3,26 +3,42 @@ import express from 'express';
 import { createServer } from 'http';
 import { networkInterfaces } from 'os';
 import { Server } from 'socket.io';
-import { createHash } from 'crypto';
+import { v4 } from 'uuid';
 
 dotenv.config();
+
+type Attachment = {
+  id: string;
+  file: File;
+  type: string;
+  name: string;
+  lastModified: number;
+};
 
 type Message = {
   username: string;
   message: string;
+  attachments: Attachment[];
 };
 
 const app = express();
 const server = createServer(app);
-const io = new Server(server);
+const io = new Server(server, {
+  path: '/chat/',
+  maxHttpBufferSize: 100e6,
+  cors: {
+    origin: [
+      `http://localhost:${process.env.PORT}`,
+      process.env.CLIENT_ENDPOINT as string,
+    ],
+    credentials: true,
+    optionsSuccessStatus: 200,
+    preflightContinue: true,
+    maxAge: 24 * 60 * 60 * 1000,
+  },
+});
 
 app.use(express.static('dist'));
-
-const hash = (message: Message) => {
-  return createHash('sha1')
-    .update(new Int8Array(message as never))
-    .digest('hex');
-};
 
 io.on('connection', (socket) => {
   const { address } = socket.handshake;
@@ -31,7 +47,7 @@ io.on('connection', (socket) => {
 
   socket.on('message', (data: Message, callback) => {
     socket.broadcast.emit('message', data);
-    callback({ ...data, id: hash(data) });
+    callback({ ...data, id: v4() });
   });
 
   socket.on('disconnect', (reason) => {
