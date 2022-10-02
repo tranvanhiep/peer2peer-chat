@@ -4,13 +4,14 @@ export const rootStyle = css`
   :root {
     --font-base: 'Roboto', sans-serif;
     --base-size: 16px;
+    --white: #ffffff;
     --avatar: #fcc934;
     --background: #202124;
     --incoming-bg-color: #31343a;
     --outgoing-bg-color: #0b57d0
       linear-gradient(130deg, #0842a0 30%, #07347e 95%);
     --incoming-color: #e8eaed;
-    --outgoing-color: #fff;
+    --outgoing-color: #ffffff;
     --input-color: #e8eaed;
     --input-bg-color: #3c4043;
     --input-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.15),
@@ -25,6 +26,7 @@ export const rootStyle = css`
     --modal-shadow: 0 -2px 8px rgba(0, 0, 0, 0.09),
       0 4px 8px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.3),
       0 2px 6px rgba(0, 0, 0, 0.15);
+    --attachment-bg-color: rgba(248, 249, 250, 0.06);
 
     font-family: var(--font-base);
     font-size: var(--base-size);
