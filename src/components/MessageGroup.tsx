@@ -12,6 +12,7 @@ const MessageGroupContainer = styled.div<MessageGroupContainerProps>`
   align-self: ${({ type }) =>
     type === MessageType.Incoming ? 'flex-start' : 'flex-end'};
   margin: 10px;
+  max-width: calc(50% - 40px);
 `;
 
 type MessageGroupProps = AvatarProps & MessageProps;
@@ -19,7 +20,7 @@ type MessageGroupProps = AvatarProps & MessageProps;
 export const MessageGroup = ({ name, type, ...rest }: MessageGroupProps) => {
   return (
     <MessageGroupContainer type={type}>
-      {type === MessageType.Incoming && <Avatar name={name} />}
+      {type === MessageType.Incoming ? <Avatar name={name} /> : null}
       <Message type={type} {...rest} />
     </MessageGroupContainer>
   );

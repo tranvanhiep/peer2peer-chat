@@ -1,12 +1,17 @@
 import styled from '@emotion/styled';
 import {
   ChangeEvent,
+  ClipboardEvent,
   FormEvent,
   KeyboardEvent,
   useCallback,
+  useEffect,
+  useReducer,
   useRef,
   useState,
 } from 'react';
+import { v4 } from 'uuid';
+import { Attachment } from './Attachment';
 import { TextArea } from './Input';
 import { InputBox } from './InputBox';
 import { SendButton } from './SendButton';
@@ -33,40 +38,96 @@ const StyledSendButton = styled(SendButton)`
   margin-left: auto;
 `;
 
+const AttachmentContainer = styled.div`
+  display: flex;
+  margin: 15px 0 5px;
+`;
+
 export type ChatBoxProps = {
-  submit(message: string): void;
+  submit(message: string, attachments: AttachmentState[]): void;
+};
+
+export type AttachmentState = {
+  id: string;
+  file: File;
+  name: string;
+  type: string;
+  lastModified: number;
+};
+
+enum AttachmentActionType {
+  Add = 'add',
+  Remove = 'remove',
+  Clear = 'clear',
+}
+
+type AttachmentAction = {
+  type: AttachmentActionType;
+  payload?: AttachmentState[] | Pick<AttachmentState, 'id'>;
+};
+
+const initialState: AttachmentState[] = [];
+
+const reducer = (state: AttachmentState[], action: AttachmentAction) => {
+  const { payload, type } = action;
+
+  switch (type) {
+    case AttachmentActionType.Add:
+      if (!Array.isArray(payload)) {
+        return state;
+      }
+
+      return [...state, ...payload];
+    case AttachmentActionType.Remove:
+      if (!payload || Array.isArray(payload)) {
+        return state;
+      }
+
+      return state.filter((item) => item.id !== payload.id);
+    case AttachmentActionType.Clear:
+      return [];
+    default:
+      return state;
+  }
 };
 
 export const ChatBox = ({ submit }: ChatBoxProps) => {
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const [line, setLine] = useState<number>(0);
   const [isSendDisabled, setIsSendDisabled] = useState<boolean>(true);
+  const [attachments, setAttachments] = useReducer(reducer, initialState);
 
-  const validateInput = useCallback((value: string) => {
-    if (value.trim()) {
+  const validateInput = useCallback(() => {
+    if (textAreaRef.current?.value.trim() || attachments.length) {
       setIsSendDisabled(false);
 
       return;
     }
 
     setIsSendDisabled(true);
-  }, []);
+  }, [attachments.length]);
 
   const onSubmit = useCallback(
     (event?: FormEvent<HTMLFormElement>) => {
       event?.preventDefault();
       const { current } = textAreaRef;
 
+      if (!current?.value && !attachments) {
+        return;
+      }
+
+      submit(current?.value ?? '', attachments);
+      setLine(0);
+      setIsSendDisabled(true);
+      setAttachments({ type: AttachmentActionType.Clear });
+
       if (!current?.value) {
         return;
       }
 
-      submit(current.value);
       current.value = '';
-      setLine(0);
-      setIsSendDisabled(true);
     },
-    [submit]
+    [submit, attachments]
   );
 
   const onKeyDown = useCallback(
@@ -89,14 +150,54 @@ export const ChatBox = ({ submit }: ChatBoxProps) => {
       const lines = target.value.split('\n').length;
 
       setLine(lines ? lines : 0);
-      validateInput(target.value);
+      validateInput();
     },
     [validateInput]
   );
 
+  const onPaste = useCallback((event: ClipboardEvent) => {
+    const { clipboardData } = event;
+
+    if (!clipboardData.files.length) {
+      return;
+    }
+
+    event.preventDefault();
+
+    const payload = Array.from(clipboardData.files).map((file) => {
+      const { lastModified, name, type } = file;
+
+      return {
+        id: v4(),
+        file,
+        name,
+        type,
+        lastModified,
+      };
+    });
+
+    setAttachments({ type: AttachmentActionType.Add, payload });
+    setIsSendDisabled(!payload.length);
+  }, []);
+
+  const onRemove = useCallback((id: string) => {
+    setAttachments({ type: AttachmentActionType.Remove, payload: { id } });
+  }, []);
+
+  useEffect(() => {
+    validateInput();
+  }, [validateInput]);
+
   return (
     <ChatBoxContainer onSubmit={onSubmit}>
       <StyledInputBox line={line}>
+        {attachments.length ? (
+          <AttachmentContainer>
+            {attachments.map(({ id, file }) => (
+              <Attachment key={id} id={id} file={file} onRemove={onRemove} />
+            ))}
+          </AttachmentContainer>
+        ) : null}
         <TextArea
           ref={textAreaRef}
           rows={1}
@@ -104,9 +205,10 @@ export const ChatBox = ({ submit }: ChatBoxProps) => {
           placeholder="Text message"
           onChange={onChange}
           onKeyDown={onKeyDown}
+          onPaste={onPaste}
         />
       </StyledInputBox>
-      <StyledSendButton type="submit" disabled={isSendDisabled} />
+      <StyledSendButton type="submit" disabled={isSendDisabled} title="Send" />
     </ChatBoxContainer>
   );
 };

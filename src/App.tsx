@@ -1,4 +1,5 @@
 import {
+  AttachmentState,
   ChatBox,
   Layout,
   MessageGroup,
@@ -12,7 +13,16 @@ type MessageState = {
   id: string;
   username: string;
   message: string;
+  attachments: AttachmentState[];
   type: MessageType;
+};
+
+type IncomingAttachmentState = Omit<AttachmentState, 'file'> & {
+  file: ArrayBuffer;
+};
+
+type IncomingMessageState = Omit<MessageState, 'attachments'> & {
+  attachments: IncomingAttachmentState[];
 };
 
 enum MessageActionType {
@@ -42,8 +52,23 @@ const reducer = (state: MessageState[], action: MessageAction) => {
 
 function App() {
   const [open, setOpen] = useState<boolean>(false);
-  const socketRef = useRef<Socket>(io());
+  const socketRef = useRef<Socket>(
+    io(import.meta.env.VITE_WEBSOCKET_ENDPOINT, {
+      withCredentials: true,
+      path: '/chat/',
+    })
+  );
   const [messages, setMessages] = useReducer(reducer, initialState);
+
+  const transformIncomingAttachments = useCallback(
+    (attachments: IncomingAttachmentState[]) =>
+      attachments.map(({ file, type, lastModified, name, ...rest }) => {
+        const newFile = new File([file], name, { type, lastModified });
+
+        return { file: newFile, type, lastModified, name, ...rest };
+      }),
+    []
+  );
 
   useEffect(() => {
     const name = localStorage.getItem('name');
@@ -81,39 +106,51 @@ function App() {
       console.log('Can not establish connection to the server');
     });
 
-    socket.on('message', (data: Omit<MessageState, 'type'>) => {
-      setMessages({ type: MessageActionType.Receive, payload: data });
+    socket.on('message', (data: Omit<IncomingMessageState, 'type'>) => {
+      const attachments = transformIncomingAttachments(data.attachments);
+
+      setMessages({
+        type: MessageActionType.Receive,
+        payload: { ...data, attachments },
+      });
     });
 
     return () => {
       socket.disconnect();
     };
-  }, []);
+  }, [transformIncomingAttachments]);
 
-  const submit = useCallback((message: string) => {
-    const { current: socket } = socketRef;
-    const username = localStorage.getItem('name') || 'Guest';
+  const submit = useCallback(
+    (message: string, attachments: AttachmentState[]) => {
+      const { current: socket } = socketRef;
+      const username = localStorage.getItem('name') || 'Guest';
 
-    socket.emit(
-      'message',
-      { message, username },
-      (data: Omit<MessageState, 'type'>) =>
-        setMessages({
-          type: MessageActionType.Send,
-          payload: data,
-        })
-    );
-  }, []);
+      socket.emit(
+        'message',
+        { message, username, attachments },
+        (data: Omit<IncomingMessageState, 'type'>) => {
+          const attachments = transformIncomingAttachments(data.attachments);
+
+          setMessages({
+            type: MessageActionType.Send,
+            payload: { ...data, attachments },
+          });
+        }
+      );
+    },
+    [transformIncomingAttachments]
+  );
 
   return (
     <>
       <Layout>
-        {messages.map(({ message, type, username, id }) => (
+        {messages.map(({ message, type, username, id, attachments }) => (
           <MessageGroup
             key={id}
             name={username}
             type={type}
             content={message}
+            attachments={attachments}
           />
         ))}
         <ChatBox submit={submit} />

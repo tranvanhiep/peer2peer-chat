@@ -1,10 +1,18 @@
 import styled from '@emotion/styled';
+import { AttachmentMessage } from './AttachmentMessage';
+import { AttachmentState } from './ChatBox';
 
 type MessageContainerProps = {
   type: MessageType;
 };
 
-const MessageContainer = styled.div<MessageContainerProps>`
+const MessageContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+`;
+
+const TextMessage = styled.div<MessageContainerProps>`
   padding: 10px 12px;
   margin-left: ${({ type }) => (type === MessageType.Incoming ? '10px' : '0')};
   background: ${({ type }) =>
@@ -27,15 +35,25 @@ export enum MessageType {
 export type MessageProps = {
   type: MessageType;
   content: string;
+  attachments: AttachmentState[];
 };
 
-export const Message = ({ content, type }: MessageProps) => {
+export const Message = ({ content, type, attachments }: MessageProps) => {
   const htmlContent = content.trim().normalize().replace(/\\n/g, '<br />');
 
   return (
-    <MessageContainer
-      type={type}
-      dangerouslySetInnerHTML={{ __html: htmlContent }}
-    ></MessageContainer>
+    <MessageContainer>
+      {htmlContent ? (
+        <TextMessage
+          type={type}
+          dangerouslySetInnerHTML={{ __html: htmlContent }}
+        ></TextMessage>
+      ) : null}
+      {attachments.length
+        ? attachments.map(({ id, file }) => (
+            <AttachmentMessage key={id} file={file}></AttachmentMessage>
+          ))
+        : null}
+    </MessageContainer>
   );
 };
