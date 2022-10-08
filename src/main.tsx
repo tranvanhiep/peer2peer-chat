@@ -1,8 +1,9 @@
 import { Global } from '@emotion/react';
+import resetStyle from '@styles/reset';
+import rootStyle from '@styles/root';
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App';
-import { rootStyle, resetStyle } from './styles';
 
 const GlobalStyle = () => (
   <>

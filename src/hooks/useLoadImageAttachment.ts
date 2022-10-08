@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-export const useLoadAttachment = (file: File) => {
+const useLoadAttachment = (file: File) => {
   const [url, setUrl] = useState<string>();
 
   useEffect(() => {
@@ -17,3 +17,5 @@ export const useLoadAttachment = (file: File) => {
 
   return url;
 };
+
+export default useLoadAttachment;

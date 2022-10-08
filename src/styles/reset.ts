@@ -1,6 +1,6 @@
 import { css } from '@emotion/react';
 
-export const resetStyle = css`
+const resetStyle = css`
   /* http://meyerweb.com/eric/tools/css/reset/
    v2.0 | 20110126
    License: none (public domain)
@@ -131,3 +131,5 @@ export const resetStyle = css`
     border-spacing: 0;
   }
 `;
+
+export default resetStyle;

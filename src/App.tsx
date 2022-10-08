@@ -1,21 +1,11 @@
-import {
-  AttachmentState,
-  ChatBox,
-  Layout,
-  MessageGroup,
-  MessageType,
-  Modal,
-} from '@components/index';
-import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
-import { io, Socket } from 'socket.io-client';
-
-type MessageState = {
-  id: string;
-  username: string;
-  message: string;
-  attachments: AttachmentState[];
-  type: MessageType;
-};
+import ChatBox from '@components/ChatBox/ChatBox';
+import MessageGroup from '@components/MessageGroup/MessageGroup';
+import Modal from '@components/Modal/Modal';
+import { AttachmentState } from '@reducers/attachment';
+import reducer, { MessageActionType, MessageState } from '@reducers/message';
+import { Layout } from 'App.styled';
+import { useCallback, useEffect, useReducer, useState } from 'react';
+import { io } from 'socket.io-client';
 
 type IncomingAttachmentState = Omit<AttachmentState, 'file'> & {
   file: ArrayBuffer;
@@ -25,39 +15,15 @@ type IncomingMessageState = Omit<MessageState, 'attachments'> & {
   attachments: IncomingAttachmentState[];
 };
 
-enum MessageActionType {
-  Send = 'send',
-  Receive = 'receive',
-}
-
-type MessageAction = {
-  type: MessageActionType;
-  payload: Omit<MessageState, 'type'>;
-};
-
 const initialState: MessageState[] = [];
 
-const reducer = (state: MessageState[], action: MessageAction) => {
-  const { type, payload } = action;
-
-  switch (type) {
-    case MessageActionType.Send:
-      return [...state, { ...payload, type: MessageType.Outgoing }];
-    case MessageActionType.Receive:
-      return [...state, { ...payload, type: MessageType.Incoming }];
-    default:
-      return state;
-  }
-};
+const socket = io(import.meta.env.VITE_WEBSOCKET_ENDPOINT, {
+  withCredentials: true,
+  path: '/chat/',
+});
 
 function App() {
   const [open, setOpen] = useState<boolean>(false);
-  const socketRef = useRef<Socket>(
-    io(import.meta.env.VITE_WEBSOCKET_ENDPOINT, {
-      withCredentials: true,
-      path: '/chat/',
-    })
-  );
   const [messages, setMessages] = useReducer(reducer, initialState);
 
   const transformIncomingAttachments = useCallback(
@@ -81,8 +47,6 @@ function App() {
   }, [setOpen]);
 
   useEffect(() => {
-    const { current: socket } = socketRef;
-
     socket.on('connect', () => {
       const { connected } = socket;
 
@@ -122,7 +86,6 @@ function App() {
 
   const submit = useCallback(
     (message: string, attachments: AttachmentState[]) => {
-      const { current: socket } = socketRef;
       const username = localStorage.getItem('name') || 'Guest';
 
       socket.emit(

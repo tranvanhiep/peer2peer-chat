@@ -16,14 +16,20 @@
     "noEmit": true,
     "jsx": "react-jsx",
     "jsxImportSource": "@emotion/react",
-    "baseUrl": "./src",
+    "baseUrl": "src",
     "paths": {
       "@components/*": ["components/*"],
       "@styles/*": ["styles/*"],
       "@assets/*": ["assets/*"],
-      "@hooks/*": ["hooks/*"]
+      "@hooks/*": ["hooks/*"],
+      "@reducers/*": ["reducers/*"],
+      "@icons/*": ["icons/*"],
+      "@utils/*": ["utils/*"]
     }
   },
   "include": ["src"],
-  "references": [{ "path": "./tsconfig.node.json" }]
+  "references": [{ "path": "./tsconfig.node.json" }],
+  "ts-node": {
+    "esm": true
+  }
 }

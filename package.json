@@ -6,9 +6,9 @@
   "scripts": {
     "start": "npm run build && npm run server",
     "dev": "vite",
-    "dev:server": "nodemon --exec ts-node --esm --files server.ts",
+    "dev:server": "nodemon --exec ts-node server.ts",
     "build": "tsc && vite build",
-    "server": "ts-node --esm server.ts",
+    "server": "ts-node server.ts",
     "preview": "vite preview",
     "format": "prettier --write --loglevel warn .",
     "lint": "eslint .",
