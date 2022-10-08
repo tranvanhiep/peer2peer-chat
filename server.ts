@@ -25,17 +25,16 @@ const app = express();
 const server = createServer(app);
 const io = new Server(server, {
   path: '/chat/',
-  maxHttpBufferSize: 100e6,
+  maxHttpBufferSize: 1000e6,
   cors: {
-    origin: [
-      `http://localhost:${process.env.PORT}`,
-      process.env.CLIENT_ENDPOINT as string,
-    ],
+    origin: [process.env.CLIENT_ENDPOINT as string],
+    methods: ['GET', 'POST'],
     credentials: true,
     optionsSuccessStatus: 200,
     preflightContinue: true,
     maxAge: 24 * 60 * 60 * 1000,
   },
+  serveClient: false,
 });
 
 app.use(express.static('dist'));

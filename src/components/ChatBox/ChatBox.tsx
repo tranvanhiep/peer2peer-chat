@@ -1,4 +1,16 @@
-import styled from '@emotion/styled';
+import AttachmentThumbnail from '@components/AttachmentThumbnail/AttachmentThumbnail';
+import {
+  AttachmentContainer,
+  ChatBoxContainer,
+  StyledInputBox,
+  StyledSendButton,
+} from '@components/ChatBox/ChatBox.styled';
+import { TextArea } from '@components/Input/Input';
+import reducer, {
+  AttachmentActionType,
+  AttachmentState,
+} from '@reducers/attachment';
+import genId from '@utils/genId';
 import {
   ChangeEvent,
   ClipboardEvent,
@@ -10,88 +22,14 @@ import {
   useRef,
   useState,
 } from 'react';
-import { v4 } from 'uuid';
-import { Attachment } from './Attachment';
-import { TextArea } from './Input';
-import { InputBox } from './InputBox';
-import { SendButton } from './SendButton';
-
-const ChatBoxContainer = styled.form`
-  display: flex;
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  padding: 0 30px 30px;
-`;
-
-type StyledInputBoxProps = {
-  line: number;
-};
-
-const StyledInputBox = styled(InputBox)<StyledInputBoxProps>`
-  margin-right: 8px;
-  height: ${({ line }) => (line * 20 > 52 ? `${line * 20}px` : 'auto')};
-`;
-
-const StyledSendButton = styled(SendButton)`
-  margin-left: auto;
-`;
-
-const AttachmentContainer = styled.div`
-  display: flex;
-  margin: 15px 0 5px;
-`;
 
 export type ChatBoxProps = {
   submit(message: string, attachments: AttachmentState[]): void;
 };
 
-export type AttachmentState = {
-  id: string;
-  file: File;
-  name: string;
-  type: string;
-  lastModified: number;
-};
-
-enum AttachmentActionType {
-  Add = 'add',
-  Remove = 'remove',
-  Clear = 'clear',
-}
-
-type AttachmentAction = {
-  type: AttachmentActionType;
-  payload?: AttachmentState[] | Pick<AttachmentState, 'id'>;
-};
-
 const initialState: AttachmentState[] = [];
 
-const reducer = (state: AttachmentState[], action: AttachmentAction) => {
-  const { payload, type } = action;
-
-  switch (type) {
-    case AttachmentActionType.Add:
-      if (!Array.isArray(payload)) {
-        return state;
-      }
-
-      return [...state, ...payload];
-    case AttachmentActionType.Remove:
-      if (!payload || Array.isArray(payload)) {
-        return state;
-      }
-
-      return state.filter((item) => item.id !== payload.id);
-    case AttachmentActionType.Clear:
-      return [];
-    default:
-      return state;
-  }
-};
-
-export const ChatBox = ({ submit }: ChatBoxProps) => {
+const ChatBox = ({ submit }: ChatBoxProps) => {
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const [line, setLine] = useState<number>(0);
   const [isSendDisabled, setIsSendDisabled] = useState<boolean>(true);
@@ -168,7 +106,7 @@ export const ChatBox = ({ submit }: ChatBoxProps) => {
       const { lastModified, name, type } = file;
 
       return {
-        id: v4(),
+        id: genId(),
         file,
         name,
         type,
@@ -194,7 +132,12 @@ export const ChatBox = ({ submit }: ChatBoxProps) => {
         {attachments.length ? (
           <AttachmentContainer>
             {attachments.map(({ id, file }) => (
-              <Attachment key={id} id={id} file={file} onRemove={onRemove} />
+              <AttachmentThumbnail
+                key={id}
+                id={id}
+                file={file}
+                onRemove={onRemove}
+              />
             ))}
           </AttachmentContainer>
         ) : null}
@@ -212,3 +155,5 @@ export const ChatBox = ({ submit }: ChatBoxProps) => {
     </ChatBoxContainer>
   );
 };
+
+export default ChatBox;

@@ -1,6 +1,6 @@
 import { css } from '@emotion/react';
 
-export const rootStyle = css`
+const rootStyle = css`
   :root {
     --font-base: 'Roboto', sans-serif;
     --base-size: 16px;
@@ -44,3 +44,5 @@ export const rootStyle = css`
     -webkit-text-size-adjust: 100%;
   }
 `;
+
+export default rootStyle;
