@@ -3,7 +3,6 @@ import express from 'express';
 import { createServer } from 'http';
 import { networkInterfaces } from 'os';
 import { Server } from 'socket.io';
-import { v4 } from 'uuid';
 
 dotenv.config();
 
@@ -16,9 +15,11 @@ type Attachment = {
 };
 
 type Message = {
+  id: string;
   username: string;
   message: string;
   attachments: Attachment[];
+  isDelivered: boolean;
 };
 
 const app = express();
@@ -27,9 +28,7 @@ const io = new Server(server, {
   path: '/chat/',
   maxHttpBufferSize: 1000e6,
   cors: {
-    origin: [process.env.CLIENT_ENDPOINT as string],
     methods: ['GET', 'POST'],
-    credentials: true,
     optionsSuccessStatus: 200,
     preflightContinue: true,
     maxAge: 24 * 60 * 60 * 1000,
@@ -45,8 +44,10 @@ io.on('connection', (socket) => {
   const client = ip?.length ? ip.at(0) || 'Unknown' : 'Host';
 
   socket.on('message', (data: Message, callback) => {
-    socket.broadcast.emit('message', data);
-    callback({ ...data, id: v4() });
+    const message = { ...data, isDelivered: true };
+
+    socket.broadcast.emit('message', message);
+    callback(message);
   });
 
   socket.on('disconnect', (reason) => {
@@ -67,5 +68,5 @@ const getIP = () => {
 };
 
 server.listen(process.env.PORT, () => {
-  console.log(`The app is host at ${getIP()}:${process.env.PORT}`);
+  console.log(`The app is hosted at ${getIP()}:${process.env.PORT}`);
 });

@@ -2,15 +2,17 @@ import {
   FileAttachmentMessage,
   ImageAttachmentMessage,
   StyledFileIcon,
+  Text,
 } from '@components/AttachmentMessage/AttachmentMessage.styled';
 import useIsImageAttachment from '@hooks/useIsImageAttachment';
 import useLoadAttachment from '@hooks/useLoadImageAttachment';
 
 type AttachmentMessageProps = {
   file: File;
+  isDelivered: boolean;
 };
 
-const AttachmentMessage = ({ file }: AttachmentMessageProps) => {
+const AttachmentMessage = ({ file, isDelivered }: AttachmentMessageProps) => {
   const { type, name } = file;
   const isImageAttachment = useIsImageAttachment(type);
   const url = useLoadAttachment(file);
@@ -25,6 +27,7 @@ const AttachmentMessage = ({ file }: AttachmentMessageProps) => {
           {name}
         </FileAttachmentMessage>
       )}
+      <Text>{!isDelivered ? 'Sending...' : null}</Text>
     </>
   );
 };

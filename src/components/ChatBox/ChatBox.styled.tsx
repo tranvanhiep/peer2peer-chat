@@ -1,23 +1,24 @@
+import { TextArea } from '@components/Input/Input';
 import InputBox from '@components/InputBox/InputBox';
 import SendButton from '@components/SendButton/SendButton';
 import styled from '@emotion/styled';
 
 export const ChatBoxContainer = styled.form`
   display: flex;
-  position: absolute;
+  position: sticky;
   left: 0;
   right: 0;
   bottom: 0;
   padding: 0 30px 30px;
+  background-color: var(--background);
 `;
 
-type StyledInputBoxProps = {
-  line: number;
-};
-
-export const StyledInputBox = styled(InputBox)<StyledInputBoxProps>`
+export const StyledInputBox = styled(InputBox)`
   margin-right: 8px;
-  height: ${({ line }) => (line * 20 > 52 ? `${line * 20}px` : 'auto')};
+`;
+
+export const StyledTextArea = styled(TextArea)`
+  overflow-y: ${({ rows = 1 }) => (rows === 4 ? 'auto' : 'hidden')};
 `;
 
 export const StyledSendButton = styled(SendButton)`
@@ -26,5 +27,10 @@ export const StyledSendButton = styled(SendButton)`
 
 export const AttachmentContainer = styled.div`
   display: flex;
+  flex-wrap: wrap;
   margin: 15px 0 5px;
+`;
+
+export const TextAreaContainer = styled.div`
+  display: flex;
 `;

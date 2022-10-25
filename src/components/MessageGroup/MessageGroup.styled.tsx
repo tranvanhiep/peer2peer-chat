@@ -12,4 +12,5 @@ export const MessageGroupContainer = styled.div<MessageGroupContainerProps>`
     type === MessageType.Incoming ? 'flex-start' : 'flex-end'};
   margin: 10px;
   max-width: calc(50% - 40px);
+  word-break: break-word;
 `;

@@ -2,6 +2,7 @@ import styled from '@emotion/styled';
 import FileIcon from '@icons/FileIcon';
 
 export const AttachmentThumbnailContainer = styled.div`
+  margin-bottom: 10px;
   background-color: var(--background);
   border-radius: 4px;
 
