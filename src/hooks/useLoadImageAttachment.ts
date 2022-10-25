@@ -1,19 +1,13 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 
 const useLoadAttachment = (file: File) => {
-  const [url, setUrl] = useState<string>();
+  const url = URL.createObjectURL(file);
 
   useEffect(() => {
-    setUrl(URL.createObjectURL(file));
-
     return () => {
-      if (!url) {
-        return;
-      }
-
       URL.revokeObjectURL(url);
     };
-  }, [file, url]);
+  }, [url]);
 
   return url;
 };

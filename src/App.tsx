@@ -3,6 +3,7 @@ import MessageGroup from '@components/MessageGroup/MessageGroup';
 import Modal from '@components/Modal/Modal';
 import { AttachmentState } from '@reducers/attachment';
 import reducer, { MessageActionType, MessageState } from '@reducers/message';
+import genId from '@utils/genId';
 import { Layout } from 'App.styled';
 import { useCallback, useEffect, useReducer, useState } from 'react';
 import { io } from 'socket.io-client';
@@ -17,10 +18,7 @@ type IncomingMessageState = Omit<MessageState, 'attachments'> & {
 
 const initialState: MessageState[] = [];
 
-const socket = io(import.meta.env.VITE_WEBSOCKET_ENDPOINT, {
-  withCredentials: true,
-  path: '/chat/',
-});
+const socket = io({ path: '/chat/' });
 
 function App() {
   const [open, setOpen] = useState<boolean>(false);
@@ -87,15 +85,20 @@ function App() {
   const submit = useCallback(
     (message: string, attachments: AttachmentState[]) => {
       const username = localStorage.getItem('name') || 'Guest';
+      const payload = { id: genId(), message, username, attachments };
+      setMessages({
+        type: MessageActionType.Send,
+        payload: { ...payload, isDelivered: false },
+      });
 
       socket.emit(
         'message',
-        { message, username, attachments },
+        payload,
         (data: Omit<IncomingMessageState, 'type'>) => {
           const attachments = transformIncomingAttachments(data.attachments);
 
           setMessages({
-            type: MessageActionType.Send,
+            type: MessageActionType.Deliver,
             payload: { ...data, attachments },
           });
         }
@@ -107,15 +110,18 @@ function App() {
   return (
     <>
       <Layout>
-        {messages.map(({ message, type, username, id, attachments }) => (
-          <MessageGroup
-            key={id}
-            name={username}
-            type={type}
-            content={message}
-            attachments={attachments}
-          />
-        ))}
+        {messages.map(
+          ({ message, type, username, id, attachments, isDelivered }) => (
+            <MessageGroup
+              key={id}
+              name={username}
+              type={type}
+              content={message}
+              attachments={attachments}
+              isDelivered={isDelivered}
+            />
+          )
+        )}
         <ChatBox submit={submit} />
       </Layout>
       <Modal open={open} />

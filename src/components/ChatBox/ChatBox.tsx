@@ -1,11 +1,13 @@
+import AttachButton from '@components/AttachButton/AttachButton';
 import AttachmentThumbnail from '@components/AttachmentThumbnail/AttachmentThumbnail';
 import {
   AttachmentContainer,
   ChatBoxContainer,
   StyledInputBox,
   StyledSendButton,
+  StyledTextArea,
+  TextAreaContainer,
 } from '@components/ChatBox/ChatBox.styled';
-import { TextArea } from '@components/Input/Input';
 import reducer, {
   AttachmentActionType,
   AttachmentState,
@@ -31,7 +33,7 @@ const initialState: AttachmentState[] = [];
 
 const ChatBox = ({ submit }: ChatBoxProps) => {
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
-  const [line, setLine] = useState<number>(0);
+  const [line, setLine] = useState<number>(1);
   const [isSendDisabled, setIsSendDisabled] = useState<boolean>(true);
   const [attachments, setAttachments] = useReducer(reducer, initialState);
 
@@ -55,7 +57,7 @@ const ChatBox = ({ submit }: ChatBoxProps) => {
       }
 
       submit(current?.value ?? '', attachments);
-      setLine(0);
+      setLine(1);
       setIsSendDisabled(true);
       setAttachments({ type: AttachmentActionType.Clear });
 
@@ -85,24 +87,22 @@ const ChatBox = ({ submit }: ChatBoxProps) => {
   const onChange = useCallback(
     (event: ChangeEvent<HTMLTextAreaElement>) => {
       const { target } = event;
-      const lines = target.value.split('\n').length;
+      const returnLine = target.value.split('\n').length || 1;
+      const charPerLine = target.clientWidth / 10;
+      const lineByLength =
+        target.value.length > charPerLine
+          ? Math.ceil(target.value.length / charPerLine) - 1 || 1
+          : 0;
+      const line = returnLine + lineByLength;
 
-      setLine(lines ? lines : 0);
+      setLine(line > 4 ? 4 : line);
       validateInput();
     },
     [validateInput]
   );
 
-  const onPaste = useCallback((event: ClipboardEvent) => {
-    const { clipboardData } = event;
-
-    if (!clipboardData.files.length) {
-      return;
-    }
-
-    event.preventDefault();
-
-    const payload = Array.from(clipboardData.files).map((file) => {
+  const onAttachmentChange = useCallback((files: FileList) => {
+    const payload = Array.from(files).map((file) => {
       const { lastModified, name, type } = file;
 
       return {
@@ -118,6 +118,20 @@ const ChatBox = ({ submit }: ChatBoxProps) => {
     setIsSendDisabled(!payload.length);
   }, []);
 
+  const onPaste = useCallback(
+    (event: ClipboardEvent) => {
+      const { clipboardData } = event;
+
+      if (!clipboardData.files.length) {
+        return;
+      }
+
+      event.preventDefault();
+      onAttachmentChange(clipboardData.files);
+    },
+    [onAttachmentChange]
+  );
+
   const onRemove = useCallback((id: string) => {
     setAttachments({ type: AttachmentActionType.Remove, payload: { id } });
   }, []);
@@ -128,7 +142,7 @@ const ChatBox = ({ submit }: ChatBoxProps) => {
 
   return (
     <ChatBoxContainer onSubmit={onSubmit}>
-      <StyledInputBox line={line}>
+      <StyledInputBox>
         {attachments.length ? (
           <AttachmentContainer>
             {attachments.map(({ id, file }) => (
@@ -141,15 +155,18 @@ const ChatBox = ({ submit }: ChatBoxProps) => {
             ))}
           </AttachmentContainer>
         ) : null}
-        <TextArea
-          ref={textAreaRef}
-          rows={1}
-          name="message"
-          placeholder="Text message"
-          onChange={onChange}
-          onKeyDown={onKeyDown}
-          onPaste={onPaste}
-        />
+        <TextAreaContainer>
+          <StyledTextArea
+            ref={textAreaRef}
+            rows={line}
+            name="message"
+            placeholder="Text message"
+            onChange={onChange}
+            onKeyDown={onKeyDown}
+            onPaste={onPaste}
+          />
+          <AttachButton onAttachmentChange={onAttachmentChange} />
+        </TextAreaContainer>
       </StyledInputBox>
       <StyledSendButton type="submit" disabled={isSendDisabled} title="Send" />
     </ChatBoxContainer>

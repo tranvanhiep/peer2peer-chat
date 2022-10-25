@@ -10,22 +10,33 @@ export type MessageProps = {
   type: MessageType;
   content: string;
   attachments: AttachmentState[];
+  isDelivered: boolean;
 };
 
-const Message = ({ content, type, attachments }: MessageProps) => {
-  const htmlContent = content.trim().normalize().replace(/\\n/g, '<br />');
+const Message = ({ content, type, attachments, isDelivered }: MessageProps) => {
+  const html = content
+    .trim()
+    .split(/\n/)
+    .map((v) =>
+      v.replace(/\s?(https?:\/\/.+)\s?/g, '<a href="$&" target="_blank">$&</a>')
+    )
+    .join('<br />');
 
   return (
-    <MessageContainer>
-      {htmlContent ? (
+    <MessageContainer type={type}>
+      {html ? (
         <TextMessage
           type={type}
-          dangerouslySetInnerHTML={{ __html: htmlContent }}
+          dangerouslySetInnerHTML={{ __html: html }}
         ></TextMessage>
       ) : null}
       {attachments.length
         ? attachments.map(({ id, file }) => (
-            <AttachmentMessage key={id} file={file}></AttachmentMessage>
+            <AttachmentMessage
+              key={id}
+              file={file}
+              isDelivered={isDelivered}
+            ></AttachmentMessage>
           ))
         : null}
     </MessageContainer>

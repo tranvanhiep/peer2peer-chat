@@ -22,3 +22,7 @@ export const FileAttachmentMessage = styled.a`
   border-radius: 20px;
   background-color: var(--attachment-bg-color);
 `;
+
+export const Text = styled.p`
+  margin-top: 5px;
+`;

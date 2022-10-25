@@ -1,17 +1,15 @@
 import styled from '@emotion/styled';
-import CloseIcon from '@icons/CloseIcon';
+import AttachIcon from '@icons/AttachIcon';
 
-export const StyledCloseIcon = styled(CloseIcon)`
+export const StyledAttachIcon = styled(AttachIcon)`
+  width: 24px;
+  height: 24px;
   fill: var(--icon-color);
   color: var(--icon-color);
-  width: 20px;
-  height: 20px;
 `;
 
-export const Button = styled.button`
-  position: absolute;
-  top: -20px;
-  right: -20px;
+export const AttachButtonContainer = styled.button`
+  position: relative;
   padding: 12px;
   border: none;
   outline: none;
@@ -27,8 +25,8 @@ export const Button = styled.button`
     bottom: 0;
     width: 100%;
     height: 100%;
-    border-radius: 50%;
     background-color: var(--white);
+    border-radius: 50%;
     opacity: 0;
   }
 
@@ -38,3 +36,5 @@ export const Button = styled.button`
     }
   }
 `;
+
+export const FileInput = styled.input``;

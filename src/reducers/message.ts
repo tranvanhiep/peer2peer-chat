@@ -8,6 +8,7 @@ export enum MessageType {
 export enum MessageActionType {
   Send = 'send',
   Receive = 'receive',
+  Deliver = 'deliver',
 }
 
 export type MessageAction = {
@@ -21,6 +22,7 @@ export type MessageState = {
   message: string;
   attachments: AttachmentState[];
   type: MessageType;
+  isDelivered: boolean;
 };
 
 const reducer = (state: MessageState[], action: MessageAction) => {
@@ -29,6 +31,14 @@ const reducer = (state: MessageState[], action: MessageAction) => {
   switch (type) {
     case MessageActionType.Send:
       return [...state, { ...payload, type: MessageType.Outgoing }];
+    case MessageActionType.Deliver:
+      return state.map((item) => {
+        if (item.id !== payload.id) {
+          return item;
+        }
+
+        return { ...item, isDelivered: true };
+      });
     case MessageActionType.Receive:
       return [...state, { ...payload, type: MessageType.Incoming }];
     default:

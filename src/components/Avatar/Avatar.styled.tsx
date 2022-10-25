@@ -5,6 +5,7 @@ export const AvatarContainer = styled.div`
   flex-direction: column;
   align-items: center;
   max-width: 100px;
+  margin-right: 10px;
 `;
 
 export const AvatarImage = styled.div`

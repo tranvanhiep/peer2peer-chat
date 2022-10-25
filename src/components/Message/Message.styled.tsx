@@ -5,10 +5,11 @@ type MessageContainerProps = {
   type: MessageType;
 };
 
-export const MessageContainer = styled.div`
+export const MessageContainer = styled.div<MessageContainerProps>`
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: ${({ type }) =>
+    type === MessageType.Incoming ? 'flex-start' : 'flex-end'};
 `;
 
 export const TextMessage = styled.div<MessageContainerProps>`
