@@ -14,8 +14,9 @@ const rootStyle = css`
     --outgoing-color: #ffffff;
     --input-color: #e8eaed;
     --input-bg-color: #3c4043;
-    --input-shadow: 0 1px 5px 0 rgba(0, 0, 0, 0.15),
-      0 4px 4px 0 rgba(0, 0, 0, 0.1), 0 -0.1px 3px 0 rgba(0, 0, 0, 0.08);
+    --input-shadow:
+      0 1px 5px 0 rgba(0, 0, 0, 0.15), 0 4px 4px 0 rgba(0, 0, 0, 0.1),
+      0 -0.1px 3px 0 rgba(0, 0, 0, 0.08);
     --button-shadow: 0 2px 4px rgb(0 0 0 / 14%), 0 3px 4px rgb(0 0 0 / 12%);
     --button-inactive-color: #9aa0a6;
     --button-active-color: #1a73e8;
@@ -23,9 +24,9 @@ const rootStyle = css`
     --icon-disabled-color: rgba(232, 234, 237, 0.38);
     --modal-bg-color: #2a2b2e;
     --modal-color: #e8eaed;
-    --modal-shadow: 0 -2px 8px rgba(0, 0, 0, 0.09),
-      0 4px 8px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.3),
-      0 2px 6px rgba(0, 0, 0, 0.15);
+    --modal-shadow:
+      0 -2px 8px rgba(0, 0, 0, 0.09), 0 4px 8px rgba(0, 0, 0, 0.06),
+      0 1px 2px rgba(0, 0, 0, 0.3), 0 2px 6px rgba(0, 0, 0, 0.15);
     --attachment-bg-color: rgba(248, 249, 250, 0.06);
 
     font-family: var(--font-base);
