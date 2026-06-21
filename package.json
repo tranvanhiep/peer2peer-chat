@@ -3,6 +3,9 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "start": "npm run build && npm run server",
     "dev": "vite",
@@ -10,7 +13,7 @@
     "build": "tsc && vite build",
     "server": "ts-node server.ts",
     "preview": "vite preview",
-    "format": "prettier --write --loglevel warn .",
+    "format": "prettier --write --log-level warn .",
     "lint": "eslint .",
     "lint:fix": "eslint --fix ."
   },
@@ -26,23 +29,24 @@
     "uuid": "^9.0.0"
   },
   "devDependencies": {
+    "@eslint-react/eslint-plugin": "^5.9.1",
+    "@eslint/js": "^10.0.1",
     "@babel/core": "^7.29.7",
     "@types/express": "^5.0.6",
     "@types/react": "^18.0.17",
     "@types/react-dom": "^18.0.6",
     "@types/uuid": "^8.3.4",
-    "@typescript-eslint/eslint-plugin": "^8.61.1",
-    "@typescript-eslint/parser": "^8.61.1",
     "@vitejs/plugin-react": "^6.0.2",
-    "eslint": "^8.57.1",
-    "eslint-config-prettier": "^8.5.0",
-    "eslint-plugin-prettier": "^4.2.1",
-    "eslint-plugin-react": "^7.37.5",
-    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint": "^10.5.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.6",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.6.0",
     "nodemon": "^3.1.14",
-    "prettier": "^2.7.1",
+    "prettier": "^3.8.4",
     "ts-node": "^10.9.1",
     "typescript": "^6.0.3",
+    "typescript-eslint": "^8.61.1",
     "vite": "^8.0.16"
   },
   "description": "peer to peer chat app",

@@ -4,7 +4,7 @@ import Modal from '@components/Modal/Modal';
 import { AttachmentState } from '@reducers/attachment';
 import reducer, { MessageActionType, MessageState } from '@reducers/message';
 import genId from '@utils/genId';
-import { Layout } from 'App.styled';
+import { Layout } from './App.styled';
 import { useCallback, useEffect, useReducer, useState } from 'react';
 import { io } from 'socket.io-client';
 

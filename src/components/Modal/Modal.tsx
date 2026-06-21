@@ -19,7 +19,7 @@ const Modal = ({ open = false }: ModalProps) => {
   const [disabled, setDisabled] = useState<boolean>(true);
   const [close, setClose] = useState<boolean>(false);
   const [isClosing, setIsClosing] = useState<boolean>(false);
-  const timeoutId = useRef<NodeJS.Timeout>();
+  const timeoutId = useRef<ReturnType<typeof setTimeout>>();
 
   const onChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     const { target } = event;
